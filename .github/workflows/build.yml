@@ -49,12 +49,17 @@ jobs:
       - name: Build Site
         working-directory: ./feishin
         run: npm run build:web
+        
+      - name: Debug dist
+        run: ls -la feishin/dist
 
       - name: Ensure static dir
         run: mkdir -p static
 
       - name: Copy Site
-        run: cp -afr ./feishin/dist ./static
+        run: |
+          rm -rf static/*
+          cp -a ./feishin/dist/. ./static/
 
       - name: Del Feishin
         run: rm -rf feishin
