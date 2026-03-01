@@ -1,2 +1,0 @@
-import{r as s,j as t,eA as o}from"./index-CjQERz5w.js";import{S as n}from"./settings-content-CL3SQ79K.js";import{SettingsHeader as a}from"./settings-header-Btah7uCM.js";import"./library-container-DHk90thr.js";import"./library-header-bar-DZC5zp4c.js";const c=()=>{const[e,r]=s.useState("");return t.jsxs(o.Provider,{value:e,children:[t.jsx(a,{setSearch:r}),t.jsx(n,{})]})};export{c as SettingsContextModal};
-//# sourceMappingURL=settings-modal-BnmvABvm.js.map

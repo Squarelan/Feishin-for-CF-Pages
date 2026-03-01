@@ -1,0 +1,2 @@
+import{t as m,r as S,v as s,B as l,j as i}from"./index-QFEa3Rgm.js";import{e as u,s as h}from"./query-params-B6TnnAIS.js";const P=r=>{const[e,t]=m(),c=S.useMemo(()=>u(e,s.SHARED.SEARCH_TERM)??r??void 0,[e,r]),n=l(a=>{t(o=>h(o,s.SHARED.SEARCH_TERM,a===""?null:a),{replace:!0})},300);return{searchTerm:c||void 0,setSearchTerm:n}},E="fs-filter-bar-module-filter-bar",T={filterBar:E},b=({children:r,...e})=>i.jsx("div",{className:T.filterBar,...e,children:r});export{b as F,P as u};
+//# sourceMappingURL=filter-bar-C37rcJii.js.map

@@ -1,2 +1,0 @@
-import{aj as t,ak as o}from"./index-CjQERz5w.js";const e=()=>{t({innerProps:{},modalKey:"visualizerSettings",overlayProps:{blur:0,opacity:0},size:"xl",styles:{content:{height:"90%",maxWidth:"1400px",minHeight:"600px",width:"100%"}},title:o.t("common.setting",{count:2,postProcess:"titleCase"}),transitionProps:{transition:"pop"}})};export{e as o};
-//# sourceMappingURL=open-visualizer-settings-modal-DOfkS3ld.js.map

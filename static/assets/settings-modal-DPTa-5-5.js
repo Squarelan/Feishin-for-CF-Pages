@@ -1,0 +1,2 @@
+import{r as s,j as t,eA as o}from"./index-QFEa3Rgm.js";import{S as n}from"./settings-content-DRYgt7Dp.js";import{SettingsHeader as a}from"./settings-header-D9xFXtuD.js";import"./library-container-xVHlpdd5.js";import"./library-header-bar-CW3doBR8.js";const c=()=>{const[e,r]=s.useState("");return t.jsxs(o.Provider,{value:e,children:[t.jsx(a,{setSearch:r}),t.jsx(n,{})]})};export{c as SettingsContextModal};
+//# sourceMappingURL=settings-modal-DPTa-5-5.js.map
