@@ -4,33 +4,61 @@ on:
   issues:
     types:
       - opened
+  workflow_dispatch:
 
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    steps: 
+    steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           persist-credentials: false
-          fetch-depth: 0             
-      - name: Checkout submodules
+          fetch-depth: 0
+
+      - name: Clone feishin
         run: git clone https://github.com/jeffvli/feishin.git
+
       - name: Setup NodeJs
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
+      - name: Patch chroma-js dependency
+        working-directory: ./feishin
+        run: |
+          node -e "
+          const fs=require('fs');
+          const path='./package.json';
+          const pkg=JSON.parse(fs.readFileSync(path,'utf8'));
+          pkg.dependencies=pkg.dependencies||{};
+          if(!pkg.dependencies['chroma-js']){
+            pkg.dependencies['chroma-js']='^2.6.0';
+            console.log('Added chroma-js dependency');
+          } else {
+            console.log('chroma-js already exists');
+          }
+          fs.writeFileSync(path, JSON.stringify(pkg,null,2));
+          "
+
       - name: Install Deps
         working-directory: ./feishin
         run: npm install --legacy-peer-deps --ignore-scripts
+
       - name: Build Site
         working-directory: ./feishin
         run: npm run build:web
+
+      - name: Ensure static dir
+        run: mkdir -p static
+
       - name: Copy Site
         run: cp -afr ./feishin/release/app/dist/web ./static
+
       - name: Del Feishin
         run: rm -rf feishin
+
       - name: Commit & Push changes
         uses: actions-js/push@master
         with:
