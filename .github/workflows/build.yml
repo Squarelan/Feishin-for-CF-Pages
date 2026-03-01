@@ -50,27 +50,27 @@ jobs:
         working-directory: ./feishin
         run: npm run build:web
         
-      - name: Debug outDir in web.vite.config.ts
+      - name: Debug build outputs (find index.html)
         run: |
-          echo "=== web.vite.config.ts (outDir clues) ==="
-          grep -nE "outDir|build:" -n feishin/web.vite.config.ts || true
-          echo "=== list top-level folders ==="
+          echo "=== list feishin top ==="
           ls -la feishin
-      
-      - name: Find built index.html
-        run: |
-          echo "=== find index.html under feishin ==="
-          find feishin -maxdepth 6 -type f -name "index.html" -print
-          echo "=== find common output dirs ==="
-          find feishin -maxdepth 6 -type d \( -name "dist" -o -name "web" -o -name "build" -o -name "out" -o -name "release" \) -print
+          echo "=== find index.html under feishin (depth<=8) ==="
+          find feishin -maxdepth 8 -type f -name "index.html" -print
 
       - name: Ensure static dir
         run: mkdir -p static
 
-      - name: Copy Site
+      - name: Copy Site (auto-detect outDir)
         run: |
+          set -e
           rm -rf static/*
-          cp -a ./feishin/dist/. ./static/
+          OUTDIR="$(dirname "$(find feishin -maxdepth 8 -type f -name index.html | head -n 1)")"
+          if [ -z "$OUTDIR" ]; then
+            echo "ERROR: index.html not found under feishin. Build output dir unknown."
+            exit 1
+          fi
+          echo "Detected OUTDIR: $OUTDIR"
+          cp -a "$OUTDIR/." ./static/
 
       - name: Del Feishin
         run: rm -rf feishin
