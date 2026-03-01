@@ -74,6 +74,10 @@ jobs:
         run: |
           cp -a "${{ steps.detect.outputs.outdir }}/." ./static/
 
+      - name: Remove sourcemaps for Cloudflare Pages (25MiB limit)
+        run: |
+          find static -type f -name "*.map" -delete
+
       - name: Remove feishin source
         run: rm -rf feishin
 
