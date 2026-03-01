@@ -50,8 +50,19 @@ jobs:
         working-directory: ./feishin
         run: npm run build:web
         
-      - name: Debug dist
-        run: ls -la feishin/dist
+      - name: Debug outDir in web.vite.config.ts
+        run: |
+          echo "=== web.vite.config.ts (outDir clues) ==="
+          grep -nE "outDir|build:" -n feishin/web.vite.config.ts || true
+          echo "=== list top-level folders ==="
+          ls -la feishin
+      
+      - name: Find built index.html
+        run: |
+          echo "=== find index.html under feishin ==="
+          find feishin -maxdepth 6 -type f -name "index.html" -print
+          echo "=== find common output dirs ==="
+          find feishin -maxdepth 6 -type d \( -name "dist" -o -name "web" -o -name "build" -o -name "out" -o -name "release" \) -print
 
       - name: Ensure static dir
         run: mkdir -p static
