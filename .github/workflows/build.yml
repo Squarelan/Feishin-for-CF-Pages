@@ -2,29 +2,32 @@ name: Build Site
 
 on:
   issues:
-    types:
-      - opened
+    types: [opened]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   release:
-    name: Release
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          persist-credentials: false
           fetch-depth: 0
+          persist-credentials: true
 
       - name: Clone feishin
         run: git clone https://github.com/jeffvli/feishin.git
 
-      - name: Setup NodeJs
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
+      # ===== 修复 chroma-js 缺失 =====
       - name: Patch chroma-js dependency
         working-directory: ./feishin
         run: |
@@ -42,40 +45,43 @@ jobs:
           fs.writeFileSync(path, JSON.stringify(pkg,null,2));
           "
 
-      - name: Install Deps
+      - name: Install dependencies
         working-directory: ./feishin
         run: npm install --legacy-peer-deps --ignore-scripts
 
-      - name: Build Site
+      - name: Build web version
         working-directory: ./feishin
         run: npm run build:web
-        
-      - name: Debug build outputs (find index.html)
-        run: |
-          echo "=== list feishin top ==="
-          ls -la feishin
-          echo "=== find index.html under feishin (depth<=8) ==="
-          find feishin -maxdepth 8 -type f -name "index.html" -print
 
-      - name: Ensure static dir
-        run: mkdir -p static
-
-      - name: Copy Site (auto-detect outDir)
+      # ===== 自动查找构建输出目录 =====
+      - name: Detect build output directory
+        id: detect
         run: |
-          set -e
-          rm -rf static/*
-          OUTDIR="$(dirname "$(find feishin -maxdepth 8 -type f -name index.html | head -n 1)")"
+          OUTDIR=$(dirname "$(find feishin -maxdepth 8 -type f -name index.html | head -n 1)")
           if [ -z "$OUTDIR" ]; then
-            echo "ERROR: index.html not found under feishin. Build output dir unknown."
+            echo "❌ ERROR: Cannot find build output (index.html not found)"
             exit 1
           fi
-          echo "Detected OUTDIR: $OUTDIR"
-          cp -a "$OUTDIR/." ./static/
+          echo "Detected output directory: $OUTDIR"
+          echo "outdir=$OUTDIR" >> $GITHUB_OUTPUT
 
-      - name: Del Feishin
+      - name: Prepare static folder
+        run: |
+          mkdir -p static
+          rm -rf static/*
+
+      - name: Copy build output to static
+        run: |
+          cp -a "${{ steps.detect.outputs.outdir }}/." ./static/
+
+      - name: Remove feishin source
         run: rm -rf feishin
 
-      - name: Commit & Push changes
-        uses: actions-js/push@master
-        with:
-          github_token: ${{ secrets.PAT }}
+      # ===== 原生 git 提交 =====
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add static
+          git commit -m "Update static site" || echo "No changes to commit"
+          git push
